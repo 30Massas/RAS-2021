@@ -20,7 +20,7 @@ class Login():
     def register(self):
         email = input("Email: ")
         user = input("Username: ")
-        password = input("Password: ")
+        password = input('Password: ')
         amount = int(input("Amount to debit: "))
         self.sql.register(email=email,user=user,password=password,amount=amount)
 
