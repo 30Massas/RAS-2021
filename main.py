@@ -1,7 +1,9 @@
 from login import Login
 from sql import SQL
+from bet import Bet
 
 l = Login()
+b = Bet()
 
 while not l.logged:
 
@@ -15,9 +17,11 @@ logout = False
 while not logout:
     
     print("""#################################
-        1- Choose Sport  
-        2- Bet
-        3- See Bet History
+        1- Choose Sport (Current: """ + b.currentSport() + """)  
+        2- Bet Simple
+        3- Bet Multiple
+        4- See Bet History
+        5- Account Management
         0- Exit
 #################################""")
     choice = int(input("Option: "))
@@ -27,9 +31,18 @@ while not logout:
         logout = True
     else:
         if choice == 1:
-            pass
+            b.changeSport()
         elif choice == 2:
-            pass
+            if b.currentSport() == 'None':
+                print("Choose a Sport to Bet on!!")
+            else:
+                b.betOnGameSimple(l.id)
         elif choice == 3:
             pass
+        elif choice == 4:
+            b.seeBestHistory(l.id)
+        elif choice == 5:
+            l.accountManagement()
+            
+                
 
