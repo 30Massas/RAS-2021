@@ -37,9 +37,10 @@ class SQL():
             'email' : kw['email'],
             'name' : kw['user'],
             'password' : kw['password'],
-            'debit' : kw['amount']
+            'debit' : kw['amount'],
+            'iban' : kw['iban']
         }
-        cursor.execute("INSERT INTO user VALUES (%(email)s,%(name)s,%(password)s,%(debit)s)",values)
+        cursor.execute("INSERT INTO user VALUES (%(email)s,%(name)s,%(password)s,%(debit)s,%(iban)s)",values)
         self.connection.commit()
         cursor.close()
 
@@ -62,30 +63,53 @@ class SQL():
     def listAllBets(self, sport):
         cursor = self.connection.cursor()
         cursor.execute("SELECT odd_vitoriaCasa, equipaCasa, odd_empate, equipaVisitante, odd_vitoriaVisitante, id FROM jogo WHERE jogo.desporto=%(sport)s" , {'sport' : sport})
-        games = cursor.fetchall()
-        print("###################### Games to Bet ######################")
-        print("Game ID --> TeamA OddWinA - OddTie - OddWinB TeamB")
-        for game in games:
-            print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
-        print("#########################################################")
+        if games := cursor.fetchall():
+            print("Game ID --> TeamA OddWinA - OddTie - OddWinB TeamB")
+            print("###################### Games to Bet ######################")
+            for game in games:
+                print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
+            print("#########################################################")
+        else:
+            print('No games were found!')
         cursor.close()
 
-    def betOnGameSimple(self,user_id,game_id,amount):
+    def betOnGameSimple(self,user_id,game_id,amount,odd_choice):
         cursor = self.connection.cursor()
         values = {
             'user_id' : user_id,
             'game_id' : game_id,
-            'amount' : amount
+            'amount' : amount,
+            'equipa' : odd_choice
         }
-        cursor.execute("INSERT INTO bet (user_email,jogo_id,valor) VALUES (%(user_id)s,%(game_id)s,%(amount)s)", values)
-        cursor.execute("UPDATE user SET debit = debit - %(amount)s WHERE email = %(user_id)s ", {'amount' : amount, 'user_id' : user_id})
-        self.connection.commit()
+        # Checking if gameId actually exists
+        cursor.execute("SELECT * FROM jogo WHERE id = %(id)s",{'id' : game_id})
+        if r:=cursor.fetchone():
+            # Adding bet to user's bet
+            valor_odd = r[1+odd_choice]
+            values['valor_odd'] = valor_odd
+            cursor.execute("INSERT INTO bet (user_email,jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(user_id)s,%(game_id)s,%(amount)s,%(valor_odd)s,%(equipa)s)", values)
+            cursor.execute("UPDATE user SET debit = debit - %(amount)s WHERE email = %(user_id)s ", values)
+            self.connection.commit()
+        else:
+            print('No game was found for that GameID!\nBet could not be placed!')
         cursor.close()
 
     def seeBetHistory(self,email):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM bet WHERE user_email = (%(email)s)", {'email' : email})
-        bets = cursor.fetchall()
-        for bet in bets:
-            print(bet)
+        cursor.execute("""
+SELECT equipaCasa, odd_vitoriaCasa, odd_empate, odd_vitoriaVisitante, equipaVisitante, b.id, b.equipaEscolhida FROM jogo
+LEFT JOIN bet b ON jogo.id=b.jogo_id
+WHERE b.user_email = (%(email)s)""", {'email' : email})
+        if bets := cursor.fetchall():
+            print("#################### BET HISTORY ####################")
+            for bet in bets:
+                if bet[6] == '1':
+                    print(f"{bet[5]} - **{bet[0]}** ({bet[1]}) - {bet[2]} - ({bet[3]}) {bet[4]}")
+                elif bet[6] == '2':
+                    print(f"{bet[5]} - {bet[0]} ({bet[1]}) - **{bet[2]}** - ({bet[3]}) {bet[4]}")
+                else:
+                    print(f"{bet[5]} - {bet[0]} ({bet[1]}) - {bet[2]} - ({bet[3]}) **{bet[4]}**")
+            print("#####################################################")
+        else:
+            print("No bets have been made yet!")
         cursor.close()

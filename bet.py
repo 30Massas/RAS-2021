@@ -1,26 +1,12 @@
 from sql import SQL
 
-"""
-Aposta 
-    -Id
-    -Odd Vitoria Casa
-    -Odd Empate
-    -Odd Vitoria Visitante
-"""
-
-"""
-0 - None
-1 - Futebol
-2 - Ténis
-3 - Basquetebol
-"""
-
 sports = {
         0 : "None",
         1: "Football",
         2: "Tennis",
         3: "Basketball"
     }
+
 class Bet():
 
 
@@ -46,11 +32,12 @@ class Bet():
 
     def betOnGameSimple(self,user_id):
         self.listAllPossibleBets(self.currentSport())
-        choice = int(input(""" 1-Bet | 2-Exit \n"""))
+        choice = int(input("""1-Bet | 2-Exit \n"""))
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
+            odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
             amount = int(input("Enter the amount you want to bet: "))
-            self.sql.betOnGameSimple(user_id,game_id,amount)
+            self.sql.betOnGameSimple(user_id,game_id,amount,odd_choice)
         else:
             return
 

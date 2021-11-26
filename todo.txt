@@ -1,0 +1,19 @@
+############### Tasks To Do ###############
+
+1- Implementar aposta multipla
+
+2- Implementar fim de jogos
+
+3- Implementar retorno das apostas
+
+4- Implementar notificações de fim de jogo
+
+5- Não deixar aposta se não tiver dinheiro
+
+6- Rever base de dados (está a ficar demasiado confusa)
+
+###########################################
+
+Notas:
+
+Tentar implementar UI com flask em vez de django, parece mais simples

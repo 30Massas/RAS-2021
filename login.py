@@ -24,7 +24,8 @@ class Login():
         user = input("Username: ")
         password = input('Password: ')
         amount = int(input("Amount to debit: "))
-        self.sql.register(email=email,user=user,password=password,amount=amount)
+        iban = input("IBAN: ")
+        self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban)
 
         print('User sucessfuly registered!')
 
@@ -33,7 +34,6 @@ class Login():
 #################################
         1- Check Balance 
         2- Change Password
-        3- 
         0- Exit
 #################################
 Option: """))
