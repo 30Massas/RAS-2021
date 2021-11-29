@@ -8,9 +8,9 @@ b = Bet()
 while not l.logged:
 
     if int(input("1-Login\n2-Register\n")) == 1:
-        login = l.login()
+        l.login()
     else:
-        user = l.register()
+        l.register()
         
 logout = False
 

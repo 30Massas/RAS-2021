@@ -57,6 +57,18 @@ class SQL():
         self.connection.commit()
         cursor.close()
 
+    def deposit(self,user_id,amount):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE user SET debit = debit + %(amount)s WHERE email = %(id)s", {"amount":amount,"id":user_id} )
+        self.connection.commit()
+        cursor.close()
+
+    def withdraw(self,user_id,amount):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE user SET debit = debit - %(amount)s WHERE email = %(id)s", {"amount":amount,"id":user_id} )
+        self.connection.commit()
+        cursor.close()
+
 
 ###################### Betting ###################### 
 

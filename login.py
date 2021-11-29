@@ -32,6 +32,8 @@ class Login():
 #################################
         1- Check Balance 
         2- Change Password
+        3- Deposit
+        4- Withdraw
         0- Exit
 #################################
 Option: """))
@@ -45,6 +47,10 @@ Option: """))
                 if new_pass == confirm_pass:
                     self.sql.changePassword(new_pass,self.user.email)
         elif acc == 3:
-            pass
+            amount = int(input('How much money do you want to deposit?: '))
+            self.sql.deposit(self.user.email,amount)
+        elif acc == 4:
+            amount = int(input('How much money do you want to withdraw?: '))
+            self.sql.withdraw(self.user.email,amount)
         elif acc == 0:
             return
