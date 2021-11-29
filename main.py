@@ -36,11 +36,11 @@ while not logout:
             if b.currentSport() == 'None':
                 print("Choose a Sport to Bet on!!")
             else:
-                b.betOnGameSimple(l.id)
+                b.betOnGameSimple(l.user.email)
         elif choice == 3:
             pass
         elif choice == 4:
-            b.seeBestHistory(l.id)
+            b.seeBestHistory(l.user.email)
         elif choice == 5:
             l.accountManagement()
             

@@ -1,20 +1,18 @@
-import json
 from sql import SQL
+from user import User
 
 class Login():
 
     def __init__(self):
         self.logged = False
-        self.id = ""
-        self.password = ""
+        self.user = User()
         self.sql = SQL()
 
     def login(self):
         email = input('Email: ')
         password = input('Password: ')
         if self.sql.login(email=email,password=password):
-            self.id = email
-            self.password = password
+            self.user.setCredentials(email,password)
             self.logged = True
         else:
             self.logged = False
@@ -38,14 +36,14 @@ class Login():
 #################################
 Option: """))
         if acc == 1:
-            self.sql.checkBalance(self.id)
+            self.sql.checkBalance(self.user.email)
         elif acc == 2:
             old_pass = input("Enter old password: ")
-            if old_pass == self.password:
+            if old_pass == self.user.password:
                 new_pass = input("Enter new password: ")
                 confirm_pass = input("Confirm new password: ")
                 if new_pass == confirm_pass:
-                    self.sql.changePassword(new_pass,self.id)
+                    self.sql.changePassword(new_pass,self.user.email)
         elif acc == 3:
             pass
         elif acc == 0:
