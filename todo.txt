@@ -8,7 +8,7 @@
 
 4- Implementar notificações de fim de jogo
 
-5- Não deixar aposta se não tiver dinheiro
+5- Não deixar aposta se não tiver dinheiro [DONE]
 
 6- Rever base de dados (está a ficar demasiado confusa)
 

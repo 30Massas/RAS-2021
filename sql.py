@@ -99,8 +99,13 @@ class SQL():
             # Adding bet to user's bet
             valor_odd = r[1+odd_choice]
             values['valor_odd'] = valor_odd
-            cursor.execute("INSERT INTO bet (user_email,jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(user_id)s,%(game_id)s,%(amount)s,%(valor_odd)s,%(equipa)s)", values)
-            cursor.execute("UPDATE user SET debit = debit - %(amount)s WHERE email = %(user_id)s ", values)
+            cursor.execute("SELECT debit FROM user WHERE email = %(user_id)s",values)
+            debit = cursor.fetchone()
+            if debit[0] > amount:
+                cursor.execute("INSERT INTO bet (user_email,jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(user_id)s,%(game_id)s,%(amount)s,%(valor_odd)s,%(equipa)s)", values)
+                cursor.execute("UPDATE user SET debit = debit - %(amount)s WHERE email = %(user_id)s ", values)
+            else:
+                print("Insuficient Funds!")
             self.connection.commit()
         else:
             print('No game was found for that GameID!\nBet could not be placed!')

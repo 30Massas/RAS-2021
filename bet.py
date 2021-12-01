@@ -43,4 +43,3 @@ class Bet():
 
     def seeBestHistory(self,email):
         self.sql.seeBetHistory(email)
-        pass
