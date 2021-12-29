@@ -23,17 +23,26 @@ class Login():
         email = input("Email: ")
         user = input("Username: ")
         password = input('Password: ')
+        # Verificar se IBAN é valido
         iban = input("IBAN: ")
         bday_form_correct = False
         while not bday_form_correct:
             bday = input("Enter your birthday (YYYY-MM-DD): ")
             if re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', bday):
+                # Verificar se >18 e <100
                 bday_form_correct = True
             else:
                 print('Wrong Date Format. Please Try Again!')
         g.print_coins()
-        option = g.tipo_moedas[int(input('Choose the coin you want do deposit: '))]
-        amount = int(input('Amount: '))
+        while True:
+            try:
+                option = g.tipo_moedas[int(input('Choose the coin you want do deposit: '))]
+                break
+            except Exception:
+                print('ERROR: Invalid Option')
+        # Verificar se é > montante minimo
+        while (amount := int(input('Amount: '))) < 5:
+            print('ERROR: Value Inferior to Minimum Deposit')
         cc = input("CC: ")
         self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban,cc=cc,tipo_moeda=option,montante=amount,bday=bday)
 
