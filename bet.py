@@ -33,12 +33,12 @@ class Bet():
 
     def betOnGameSimple(self,user_id):
         self.listAllPossibleBets(self.currentSport())
-        choice = int(input("""1-Bet | 2-Exit \n"""))
+        choice = int(input("""1-Bet | 2-Exit \nOption: """))
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
             odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
             g.print_coins()
-            option = option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+            option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
             amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameSimple(user_id,game_id,option,amount,odd_choice)
         elif choice == 2:
@@ -54,13 +54,19 @@ class Bet():
         self.listAllPossibleBets(self.currentSport())
         choice = -1
         while choice != 2:
-            choice = int(input("""1-Bet | 2-Finish Bet | 3-Exit \n"""))
+            choice = int(input("""1-Bet | 2-Finish Bet | 0-Exit \nOption: """))
+            # Permitir a remoção de uma aposta do boletim
+            # Permitir visualizar o boletim
             if choice == 1:
                 game_id = int(input("Enter the GameID you want to bet on: "))
                 odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
-                amount = int(input("Enter the amount you want to bet: "))
-                games[game_id] = (odd_choice,amount)
-            else:
+                games[game_id] = odd_choice
+            elif choice == 0:
                 return
+            else:
+                print('ERROR: Invalid Option')
         else:
+            g.print_coins()
+            option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+            amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameMultiple(user_id,games)
