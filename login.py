@@ -1,5 +1,7 @@
 from sql import SQL
 from user import User
+import re
+import globals as g
 
 class Login():
 
@@ -21,9 +23,19 @@ class Login():
         email = input("Email: ")
         user = input("Username: ")
         password = input('Password: ')
-        amount = int(input("Amount to debit: "))
         iban = input("IBAN: ")
-        self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban)
+        bday_form_correct = False
+        while not bday_form_correct:
+            bday = input("Enter your birthday (YYYY-MM-DD): ")
+            if re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', bday):
+                bday_form_correct = True
+            else:
+                print('Wrong Date Format. Please Try Again!')
+        g.print_coins()
+        option = g.tipo_moedas[int(input('Choose the coin you want do deposit: '))]
+        amount = int(input('Amount: '))
+        cc = input("CC: ")
+        self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban,cc=cc,tipo_moeda=option,montante=amount,bday=bday)
 
         print('User sucessfuly registered!')
 
@@ -47,10 +59,15 @@ Option: """))
                 if new_pass == confirm_pass:
                     self.sql.changePassword(new_pass,self.user.email)
         elif acc == 3:
-            amount = int(input('How much money do you want to deposit?: '))
-            self.sql.deposit(self.user.email,amount)
+            g.print_coins()
+            option = g.tipo_moedas[int(input('Choose the coin you want do deposit: '))]
+            amount = int(input('Amount: '))
+            self.sql.deposit(self.user.email,option,amount)
         elif acc == 4:
-            amount = int(input('How much money do you want to withdraw?: '))
-            self.sql.withdraw(self.user.email,amount)
+            self.sql.checkBalance(self.user.email)
+            g.print_coins()
+            option = g.tipo_moedas[int(input('Choose the coin you want do withdraw: '))]
+            amount = int(input('Amount: '))
+            self.sql.withdraw(self.user.email,option,amount)
         elif acc == 0:
             return
