@@ -51,22 +51,33 @@ class Bet():
 
     def betOnGameMultiple(self,user_id):
         games = {}
-        self.listAllPossibleBets(self.currentSport())
+        teams = {1: 'TeamA', 2: 'Tie', 3: 'TeamB'}
         choice = -1
-        while choice != 2:
-            choice = int(input("""1-Bet | 2-Finish Bet | 0-Exit \nOption: """))
+        while choice != 3:
+            self.listAllPossibleBets(self.currentSport())
+            print('###### Current Bet ######')
+            print('GameID - Team')
+            for game,team in games.items():
+                print(f'#{game} -> {teams[team]}')
+            try:
+                choice = int(input("""1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: """))
+            except Exception:
+                print('ERROR: Invalid Option')
             # Permitir a remoção de uma aposta do boletim
             # Permitir visualizar o boletim
             if choice == 1:
                 game_id = int(input("Enter the GameID you want to bet on: "))
                 odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
                 games[game_id] = odd_choice
+            elif choice == 2:
+                game_id = int(input('Enter the GameID you want to remove: '))
+                games.pop(game_id)
             elif choice == 0:
                 return
-            else:
+            elif choice>3:
                 print('ERROR: Invalid Option')
         else:
             g.print_coins()
             option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
             amount = int(input("Enter the amount you want to bet: "))
-            self.sql.betOnGameMultiple(user_id,games)
+            self.sql.betOnGameMultiple(user_id,games,option,amount)

@@ -109,6 +109,12 @@ WHERE user_email=%(email)s""", {'email':user_id})
 
     def betOnGameSimple(self,user_id,game_id,option,amount,odd_choice):
         cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM Boletim ORDER BY id DESC LIMIT 1")
+        if r := cursor.fetchone():
+            print(r)
+            boletim_id = r[2]+1
+        else:
+            boletim_id = 1
         coin_info={
             'tipo' : option,
             'montante' : amount,
@@ -131,13 +137,14 @@ WHERE user_email=%(email)s""", {'email':user_id})
                 if debit:=cursor.fetchone()[0] > amount:
                     # Commit bet
                     cursor.execute("INSERT INTO bet (jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(jogo)s,%(amount)s,%(valor_odd)s,%(equipa)s)",bet_info)
-                    self.connection.commit()
                     # Commit boletim
                     last_id = cursor.lastrowid
                     cursor.execute("INSERT INTO Boletim (user_email,bet_id) VALUES (%(user)s,%(bet)s)", {'user' : user_id, 'bet' : last_id})
+                    cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
                     self.connection.commit()
                 else:
                     print('ERROR: Insufficient Funds')
+                    return
             elif choice == 2:
                 print('Bet Cancelled')
                 return
@@ -145,9 +152,53 @@ WHERE user_email=%(email)s""", {'email':user_id})
                 print('ERROR: Invalid Option')
         cursor.close()
     
-    def betOnGameMultiple(self,user_id,games_betted):
+    def betOnGameMultiple(self,user_id,games_betted,option,amount):
         cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM Boletim ORDER BY id DESC LIMIT 1")
+        if r := cursor.fetchone():
+            print(r)
+            boletim_id = r[2]+1
+        else:
+            boletim_id = 1
+        coin_info={
+            'tipo' : option,
+            'montante' : amount,
+            'user' : user_id
+        }
         # Fazer como na bet simples mas repetir para cada jogo que esteja no games_betted
+        # Obter row do boletim depois da primeira bet e guardar numa variabel e inserir aí
+        for game,choice in games_betted.items():
+            bet_info = {
+            'jogo' : game,
+            'equipa' : choice,
+            'amount' : amount
+            }
+            # Checking if gameId actually exists
+            cursor.execute("SELECT * FROM jogo WHERE id = %(id)s",{'id' : game})
+            if r:=cursor.fetchone():
+                valor_odd = r[1+choice]
+                bet_info['valor_odd'] = valor_odd
+                    # Check if money is enough
+                cursor.execute("SELECT montante FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s",coin_info)
+                if debit:=cursor.fetchone()[0] > amount:
+                    # Commit bet
+                    cursor.execute("INSERT INTO bet (jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(jogo)s,%(amount)s,%(valor_odd)s,%(equipa)s)",bet_info)
+                    # Commit boletim
+                    last_id = cursor.lastrowid
+                    cursor.execute("INSERT INTO Boletim (user_email,bet_id,id) VALUES (%(user)s,%(bet)s,%(b_id)s)", {'user' : user_id, 'bet' : last_id, 'b_id': boletim_id})
+                else:
+                    print('ERROR: Insufficient Funds')
+                    return
+        choice = int(input('1-Confirm\n2-Exit\nOption: '))
+        if choice == 1:
+            cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
+            self.connection.commit()
+        elif choice == 2:
+            print('Bet Cancelled')
+            return
+        else:
+            print('ERROR: Invalid Option')
+
         cursor.close()
 
     def seeBetHistory(self,email):
