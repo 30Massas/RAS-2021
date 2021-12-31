@@ -94,14 +94,17 @@ WHERE user_email=%(email)s""", {'email':user_id})
 
 ###################### Betting ###################### 
 
-    def listAllBets(self, sport):
+    def listAllBets(self, sport, categoria):
         cursor = self.connection.cursor()
         cursor.execute("SELECT odd_vitoriaCasa, equipaCasa, odd_empate, equipaVisitante, odd_vitoriaVisitante, id FROM jogo WHERE jogo.desporto=%(sport)s" , {'sport' : sport})
         if games := cursor.fetchall():
             print("Game ID --> TeamA OddWinA - OddTie - OddWinB TeamB")
             print("###################### Games to Bet ######################")
             for game in games:
-                print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
+                if categoria == 1:
+                    print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
+                else:
+                    print(f"{game[5]} --> {game[1]} {game[0]} - {game[4]} {game[3]} ")
             print("#########################################################")
         else:
             print('No games were found!')
@@ -111,7 +114,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM Boletim ORDER BY id DESC LIMIT 1")
         if r := cursor.fetchone():
-            print(r)
+            #print(r)
             boletim_id = r[2]+1
         else:
             boletim_id = 1
@@ -139,7 +142,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
                     cursor.execute("INSERT INTO bet (jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(jogo)s,%(amount)s,%(valor_odd)s,%(equipa)s)",bet_info)
                     # Commit boletim
                     last_id = cursor.lastrowid
-                    cursor.execute("INSERT INTO Boletim (user_email,bet_id) VALUES (%(user)s,%(bet)s)", {'user' : user_id, 'bet' : last_id})
+                    cursor.execute("INSERT INTO Boletim (user_email,bet_id,id) VALUES (%(user)s,%(bet)s,%(b_id)s)", {'user' : user_id, 'bet' : last_id,'b_id':boletim_id})
                     cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
                     self.connection.commit()
                 else:
@@ -156,7 +159,6 @@ WHERE user_email=%(email)s""", {'email':user_id})
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM Boletim ORDER BY id DESC LIMIT 1")
         if r := cursor.fetchone():
-            print(r)
             boletim_id = r[2]+1
         else:
             boletim_id = 1
@@ -207,4 +209,24 @@ WHERE user_email=%(email)s""", {'email':user_id})
         # For each boletim fetch all bets
         # Print bets
         # Tentar fazer paginação
+        b_ids = set()
+        cursor.execute("SELECT * FROM Boletim")
+        if boletins := cursor.fetchall():
+            for b in boletins:
+                if b[2] in b_ids:
+                    pass
+                else:
+                    print(f'Boletim #{b[2]}')
+                    b_ids.add(b[2])
+                cursor.execute("SELECT * FROM bet WHERE id=%(id)s", {'id':b[1]})
+                if bets := cursor.fetchall():
+                    for bet in bets:
+                        cursor.execute("SELECT * FROM jogo WHERE id=%(id)s",{'id':bet[1]})
+                        if jogo:=cursor.fetchone():
+                            if int(bet[4]) == 1:
+                                print(f'GameID# {bet[1]} -> {jogo[5]} ({jogo[2]})')
+                            elif int(bet[4]) == 2:
+                                print(f'GameID# {bets[1]} -> Tie ({jogo[3]})')
+                            else:
+                                print(f'GameID# {bet[1]} -> {jogo[6]} ({jogo[4]})')
         cursor.close()

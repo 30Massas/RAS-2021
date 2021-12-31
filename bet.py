@@ -8,6 +8,9 @@ sports = {
         3: "Basketball"
     }
 
+coletivos = [1,3]
+individuais = [2]
+
 class Bet():
 
 
@@ -16,7 +19,10 @@ class Bet():
         self.sport = 0
 
     def listAllPossibleBets(self,sport):
-        self.sql.listAllBets(sport)
+        if sport in coletivos:
+            self.sql.listAllBets(sport,1)
+        else:
+            self.sql.listAllBets(sport,0)
 
     def currentSport(self):
         global sports
@@ -36,7 +42,10 @@ class Bet():
         choice = int(input("""1-Bet | 2-Exit \nOption: """))
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
-            odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+            if self.currentSport() in coletivos:
+                odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+            else:
+                odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
             g.print_coins()
             option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
             amount = int(input("Enter the amount you want to bet: "))
@@ -67,7 +76,10 @@ class Bet():
             # Permitir visualizar o boletim
             if choice == 1:
                 game_id = int(input("Enter the GameID you want to bet on: "))
-                odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+                if self.currentSport() in coletivos:
+                    odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+                else:
+                    odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
                 games[game_id] = odd_choice
             elif choice == 2:
                 game_id = int(input('Enter the GameID you want to remove: '))
