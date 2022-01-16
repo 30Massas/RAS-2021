@@ -1,17 +1,21 @@
 from login import Login
 from sql import SQL
 from bet import Bet
+from observer import Observer
 
 try:
     l = Login()
     b = Bet()
-except Exception:
+    o = Observer()
+except Exception as e:
+    print(e)
     print(f'Something Went Wrong. Check The Database!')
 
 while not l.logged:
 
     if (r:=int(input("1-Login\n2-Register\nOption: "))) == 1:
         l.login()
+        o.setObservant(l.user)
     elif r==2:
         l.register()
     else:
@@ -20,7 +24,7 @@ while not l.logged:
 logout = False
 
 while not logout:
-    
+    o.run()
     print("""######################################
     1- Choose Sport (Current: """ + b.currentSport() + """)  
     2- Bet Simple

@@ -1,7 +1,8 @@
 from sql import SQL
 from user import User
-import re
 import globals as g
+import re, datetime
+from dateutil.relativedelta import relativedelta
 
 class Login():
 
@@ -30,7 +31,14 @@ class Login():
             bday = input("Enter your birthday (YYYY-MM-DD): ")
             if re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', bday):
                 # Verificar se >18 e <100
-                bday_form_correct = True
+                today = datetime.date.today()
+                compare = datetime.date.fromisoformat(bday)
+                years = relativedelta(today,compare)
+                if years.years >= 18 and years.years <= 100:
+                    bday_form_correct = True
+                else:
+                    print('You can not register!')
+                    return
             else:
                 print('Wrong Date Format. Please Try Again!')
         g.print_coins()
@@ -43,8 +51,12 @@ class Login():
         # Verificar se é > montante minimo
         while (amount := int(input('Amount: '))) < 5:
             print('ERROR: Value Inferior to Minimum Deposit')
+        # Cehck for valid CC
         cc = input("CC: ")
-        self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban,cc=cc,tipo_moeda=option,montante=amount,bday=bday)
+        try:
+            self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban,cc=cc,tipo_moeda=option,montante=amount,bday=bday)
+        except Exception:
+            print('User Already Exists!')
 
         print('User sucessfuly registered!')
 
@@ -55,6 +67,7 @@ class Login():
         2- Change Password
         3- Deposit
         4- Withdraw
+        5- Convert Currency
         0- Exit
 #################################
 Option: """))
@@ -78,5 +91,11 @@ Option: """))
             option = g.tipo_moedas[int(input('Choose the coin you want do withdraw: '))]
             amount = int(input('Amount: '))
             self.sql.withdraw(self.user.email,option,amount)
+        elif acc == 5:
+            g.print_coins()
+            to_convert = g.tipo_moedas[int(input('Choose the coin you want to convert: '))]
+            converted = g.tipo_moedas[int(input('Choose the coin you want to convert to: '))]
+            amount = int(input('Amount: '))
+            self.sql.convertCoin(self.user.email,to_convert,converted,amount)
         elif acc == 0:
             return

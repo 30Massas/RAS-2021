@@ -61,6 +61,8 @@ WHERE user_email=%(email)s""", {'email':user_id})
         if db := cursor.fetchall():
             for coins in db:
                 print(f'\t{coins[0]} {coins[1]}')
+        else:
+            print('You have no currency in your account!')
         print('###########################')
         cursor.close()
 
@@ -84,27 +86,52 @@ WHERE user_email=%(email)s""", {'email':user_id})
         cursor = self.connection.cursor()
         cursor.execute("SELECT EXISTS(SELECT * FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s)",{"user":user_id,"tipo":option})
         if (r:=cursor.fetchone()[0]) == 1: 
-            cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
+            cursor.execute("SELECT montante FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s)",{"user":user_id,"tipo":option})
+            r = cursor.fetchone()
+            if r[0] >= amount:
+                cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
+            else:
+                print('ERROR: Withdraw Not Possible.')    
         else:
             print('ERROR: Withdraw Not Possible.')
         self.connection.commit()
 
         cursor.close()
 
+    def convertCoin(self,user_id,to_convert,converted,amount):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT EXISTS(SELECT * FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s)",{"user":user_id,"tipo":to_convert})
+        if (r:=cursor.fetchone()[0]) == 1: 
+            cursor.execute("SELECT montante FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s",{"user":user_id,"tipo":to_convert})
+            r = cursor.fetchone()
+            if r[0] >= amount:
+                converted_amount = g.convertCoin(to_convert, converted, amount)
+                print(converted)
+                cursor.execute("SELECT EXISTS(SELECT * FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s)",{"user":user_id,"tipo":converted})
+                if (m:=cursor.fetchone()[0]) == 1:
+                    cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":to_convert} )
+                    cursor.execute("UPDATE moeda SET montante = montante + %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":converted_amount,"id":user_id,"tipo":converted} )
+                else:
+                    cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":to_convert})
+                    cursor.execute("INSERT INTO moeda (tipo,montante,user_email) VALUES (%(tipo)s,%(amount)s,%(id)s)", {"amount":converted_amount,"id":user_id,"tipo":converted})
+        self.connection.commit()
+        cursor.close()
 
 ###################### Betting ###################### 
 
     def listAllBets(self, sport, categoria):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT odd_vitoriaCasa, equipaCasa, odd_empate, equipaVisitante, odd_vitoriaVisitante, id FROM jogo WHERE jogo.desporto=%(sport)s" , {'sport' : sport})
+        cursor.execute("SELECT odd_vitoriaCasa, equipaCasa, odd_empate, equipaVisitante, odd_vitoriaVisitante, id, horario, estado_apostavel FROM jogo WHERE jogo.desporto=%(sport)s" , {'sport' : sport})
         if games := cursor.fetchall():
             print("Game ID --> TeamA OddWinA - OddTie - OddWinB TeamB")
             print("###################### Games to Bet ######################")
             for game in games:
                 if categoria == 1:
-                    print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
+                    if game[7] == 'Aberta':
+                        print(f"{game[5]} --> {game[1]} {game[0]} - {game[2]} - {game[4]} {game[3]} ")
                 else:
-                    print(f"{game[5]} --> {game[1]} {game[0]} - {game[4]} {game[3]} ")
+                    if game[7] == 'Aberta':
+                        print(f"{game[5]} --> {game[1]} {game[0]} - {game[4]} {game[3]} ")
             print("#########################################################")
         else:
             print('No games were found!')
@@ -125,24 +152,31 @@ WHERE user_email=%(email)s""", {'email':user_id})
         }
         bet_info = {
             'jogo' : game_id,
-            'equipa' : odd_choice,
-            'amount' : amount
-        }  
+            'equipa' : odd_choice
+        } 
+        boletim_info = {
+            'user' : user_id,
+            'estado' : 'Aberta',
+            'b_id' : boletim_id,
+            'valor' : amount,
+            'moeda' : option
+        }
         # Checking if gameId actually exists
         cursor.execute("SELECT * FROM jogo WHERE id = %(id)s",{'id' : game_id})
         if r:=cursor.fetchone():
             valor_odd = r[1+odd_choice]
             bet_info['valor_odd'] = valor_odd
+            boletim_info['valor_odd'] = valor_odd
             choice = int(input('1-Confirm\n2-Exit\nOption: '))
             if choice == 1:
                 # Check if money is enough
                 cursor.execute("SELECT montante FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s",coin_info)
                 if debit:=cursor.fetchone()[0] > amount:
                     # Commit bet
-                    cursor.execute("INSERT INTO bet (jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(jogo)s,%(amount)s,%(valor_odd)s,%(equipa)s)",bet_info)
+                    cursor.execute("INSERT INTO bet (jogo_id,odd,equipaEscolhida) VALUES (%(jogo)s,%(valor_odd)s,%(equipa)s)",bet_info)
                     # Commit boletim
-                    last_id = cursor.lastrowid
-                    cursor.execute("INSERT INTO Boletim (user_email,bet_id,id) VALUES (%(user)s,%(bet)s,%(b_id)s)", {'user' : user_id, 'bet' : last_id,'b_id':boletim_id})
+                    boletim_info['bet'] = cursor.lastrowid
+                    cursor.execute("INSERT INTO Boletim (user_email,bet_id,id,valor,total_odd,estado,moeda) VALUES (%(user)s,%(bet)s,%(b_id)s,%(valor)s,%(valor_odd)s,%(estado)s,%(moeda)s)",boletim_info)
                     cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
                     self.connection.commit()
                 else:
@@ -167,30 +201,43 @@ WHERE user_email=%(email)s""", {'email':user_id})
             'montante' : amount,
             'user' : user_id
         }
+        boletim_info = {
+            'user' : user_id,
+            'estado' : 'Aberta',
+            'b_id' : boletim_id,
+            'valor' : amount,
+            'moeda' : option
+        }
+        bets = []
         # Fazer como na bet simples mas repetir para cada jogo que esteja no games_betted
         # Obter row do boletim depois da primeira bet e guardar numa variabel e inserir aí
+        total_odd = 1
         for game,choice in games_betted.items():
             bet_info = {
             'jogo' : game,
             'equipa' : choice,
-            'amount' : amount
             }
             # Checking if gameId actually exists
             cursor.execute("SELECT * FROM jogo WHERE id = %(id)s",{'id' : game})
             if r:=cursor.fetchone():
                 valor_odd = r[1+choice]
                 bet_info['valor_odd'] = valor_odd
-                    # Check if money is enough
+                total_odd = total_odd * valor_odd
+                # Check if money is enough
                 cursor.execute("SELECT montante FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s",coin_info)
                 if debit:=cursor.fetchone()[0] > amount:
                     # Commit bet
-                    cursor.execute("INSERT INTO bet (jogo_id,valor,total_odd,equipaEscolhida) VALUES (%(jogo)s,%(amount)s,%(valor_odd)s,%(equipa)s)",bet_info)
+                    cursor.execute("INSERT INTO bet (jogo_id,odd,equipaEscolhida) VALUES (%(jogo)s,%(valor_odd)s,%(equipa)s)",bet_info)
                     # Commit boletim
                     last_id = cursor.lastrowid
-                    cursor.execute("INSERT INTO Boletim (user_email,bet_id,id) VALUES (%(user)s,%(bet)s,%(b_id)s)", {'user' : user_id, 'bet' : last_id, 'b_id': boletim_id})
+                    bets.append(last_id)
                 else:
                     print('ERROR: Insufficient Funds')
                     return
+        for bet in bets:
+            boletim_info['bet'] = bet
+            boletim_info['valor_odd'] = total_odd
+            cursor.execute("INSERT INTO Boletim (user_email,bet_id,id,valor,total_odd,estado,moeda) VALUES (%(user)s,%(bet)s,%(b_id)s,%(valor)s,%(valor_odd)s,%(estado)s,%(moeda)s)",boletim_info)
         choice = int(input('1-Confirm\n2-Exit\nOption: '))
         if choice == 1:
             cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
@@ -217,15 +264,16 @@ WHERE user_email=%(email)s""", {'email':user_id})
                     pass
                 else:
                     print(f'Boletim #{b[2]}')
+                    print(f'Amount: {b[3]} {b[6]}')
                     b_ids.add(b[2])
                 cursor.execute("SELECT * FROM bet WHERE id=%(id)s", {'id':b[1]})
                 if bets := cursor.fetchall():
                     for bet in bets:
                         cursor.execute("SELECT * FROM jogo WHERE id=%(id)s",{'id':bet[1]})
                         if jogo:=cursor.fetchone():
-                            if int(bet[4]) == 1:
+                            if int(bet[3]) == 1:
                                 print(f'GameID# {bet[1]} -> {jogo[5]} ({jogo[2]})')
-                            elif int(bet[4]) == 2:
+                            elif int(bet[3]) == 2:
                                 print(f'GameID# {bets[1]} -> Tie ({jogo[3]})')
                             else:
                                 print(f'GameID# {bet[1]} -> {jogo[6]} ({jogo[4]})')

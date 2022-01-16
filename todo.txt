@@ -1,10 +1,10 @@
 ############### Tasks To Do ###############
 
-1- Implementar aposta multipla
+1- Implementar aposta multipla [DONE]
 
-2- Implementar fim de jogos
+2- Implementar fim de jogos 
 
-3- Implementar retorno das apostas
+3- Implementar retorno das apostas [DONE] (considera sempre vencedor)
 
 4- Implementar notificações de fim de jogo
 
@@ -13,8 +13,6 @@
 6- Rever base de dados (está a ficar demasiado confusa)
 
 7- Implementar API e perceber como atualizar ao vivo ou a cada inicio da aplicação, verificar que estejam na BD e ja tenham terminado
-
-8- Atualizar base de dados para poder controlar jogos que ja passaram e dar dinheiro aos utentes
 
 ###########################################
 

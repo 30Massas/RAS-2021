@@ -18,11 +18,11 @@ class Bet():
         self.sql = SQL()
         self.sport = 0
 
-    def listAllPossibleBets(self,sport):
-        if sport in coletivos:
-            self.sql.listAllBets(sport,1)
+    def listAllPossibleBets(self):
+        if self.sport in coletivos:
+            self.sql.listAllBets(self.currentSport(),1)
         else:
-            self.sql.listAllBets(sport,0)
+            self.sql.listAllBets(self.currentSport(),0)
 
     def currentSport(self):
         global sports
@@ -38,11 +38,11 @@ class Bet():
         self.sport = int(input("What sport do you want to bet on? "))
 
     def betOnGameSimple(self,user_id):
-        self.listAllPossibleBets(self.currentSport())
+        self.listAllPossibleBets()
         choice = int(input("""1-Bet | 2-Exit \nOption: """))
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
-            if self.currentSport() in coletivos:
+            if self.sport in coletivos:
                 odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
             else:
                 odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
@@ -63,7 +63,7 @@ class Bet():
         teams = {1: 'TeamA', 2: 'Tie', 3: 'TeamB'}
         choice = -1
         while choice != 3:
-            self.listAllPossibleBets(self.currentSport())
+            self.listAllPossibleBets()
             print('###### Current Bet ######')
             print('GameID - Team')
             for game,team in games.items():
@@ -76,7 +76,7 @@ class Bet():
             # Permitir visualizar o boletim
             if choice == 1:
                 game_id = int(input("Enter the GameID you want to bet on: "))
-                if self.currentSport() in coletivos:
+                if self.sport in coletivos:
                     odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
                 else:
                     odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
