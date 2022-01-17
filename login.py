@@ -92,6 +92,7 @@ Option: """))
             amount = int(input('Amount: '))
             self.sql.withdraw(self.user.email,option,amount)
         elif acc == 5:
+            self.sql.checkBalance(self.user.email)
             g.print_coins()
             to_convert = g.tipo_moedas[int(input('Choose the coin you want to convert: '))]
             converted = g.tipo_moedas[int(input('Choose the coin you want to convert to: '))]

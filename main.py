@@ -9,10 +9,9 @@ try:
     o = Observer()
 except Exception as e:
     print(e)
-    print(f'Something Went Wrong. Check The Database!')
+    print(f'Something Went Wrong.')
 
 while not l.logged:
-
     if (r:=int(input("1-Login\n2-Register\nOption: "))) == 1:
         l.login()
         o.setObservant(l.user)

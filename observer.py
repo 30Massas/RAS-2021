@@ -1,6 +1,8 @@
 import threading, time
+import datetime as dd
 import mysql.connector as mysql
 from user import User
+
 
 class Observer:
 
@@ -18,16 +20,17 @@ class Observer:
         self.user = user
 
     def run(self):
-        handler = threading.Thread(target=self.handleResults,daemon=True)
-        handler.start()
+        result_handler = threading.Thread(target=self.handleResults,daemon=True)
+        game_handler = threading.Thread(target=self.handleGames,daemon=True)
+        result_handler.start()
+        game_handler.start()
 
     def handleResults(self):
+        cursor = self.connection.cursor()
         # Verificar de X em X tempo se os jogos já terminaram e atribuir um vencedor
         while True:
             time.sleep(120)
             # Fetch all games from user check if finished and won
-            print('\nPING\n')
-            cursor = self.connection.cursor()
             # Fetch all Boletim
             cursor.execute("SELECT * FROM boletim where user_email=%(user)s and estado='Aberta'",{'user': self.user.email})
             boletins = cursor.fetchall()
@@ -62,9 +65,20 @@ class Observer:
                     }
                     cursor.execute("UPDATE moeda SET montante = montante + %(montante)s WHERE user_email=%(user)s AND tipo=%(tipo)s",coin_info)
                     cursor.execute("UPDATE boletim SET estado = 'Fechada' WHERE id=%(b_id)s", {'b_id' : boletim})
-                    print(f'Boletim#{boletim} now closed!')
+                    print(f'OBSERVER: Boletim#{boletim} now closed!')
                     self.connection.commit()
-                else:
-                    print(f'Not all games are finished for boletim #{boletim}!')
-            cursor.close()
+        cursor.close()
 
+    def handleGames(self):
+        cursor=self.connection.cursor()
+        while True:
+            today = dd.datetime.today()
+            time.sleep(15)
+            cursor.execute("SELECT * FROM jogo WHERE estado_apostavel='Aberta'")
+            jogos = cursor.fetchall()
+            for jogo in jogos:
+                if jogo[7] <= today:
+                    print(f'\nOBSERVER: Game#{jogo[0]} -> {jogo[5]} VS {jogo[6]} has finished!\n')
+                    cursor.execute("UPDATE jogo SET estado_apostavel='Fechada' WHERE id=%(id)s",{'id':jogo[0]})
+            self.connection.commit()
+        cursor.close()

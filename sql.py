@@ -106,7 +106,6 @@ WHERE user_email=%(email)s""", {'email':user_id})
             r = cursor.fetchone()
             if r[0] >= amount:
                 converted_amount = g.convertCoin(to_convert, converted, amount)
-                print(converted)
                 cursor.execute("SELECT EXISTS(SELECT * FROM moeda WHERE user_email=%(user)s AND tipo=%(tipo)s)",{"user":user_id,"tipo":converted})
                 if (m:=cursor.fetchone()[0]) == 1:
                     cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":to_convert} )
@@ -263,7 +262,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
                 if b[2] in b_ids:
                     pass
                 else:
-                    print(f'Boletim #{b[2]}')
+                    print(f'Boletim #{b[2]} -> {b[5]}')
                     print(f'Amount: {b[3]} {b[6]}')
                     b_ids.add(b[2])
                 cursor.execute("SELECT * FROM bet WHERE id=%(id)s", {'id':b[1]})

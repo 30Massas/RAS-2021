@@ -2,20 +2,18 @@
 
 1- Implementar aposta multipla [DONE]
 
-2- Implementar fim de jogos 
+2- Implementar fim de jogos [DONE]
 
 3- Implementar retorno das apostas [DONE] (considera sempre vencedor)
 
-4- Implementar notificações de fim de jogo
+4- Não deixar aposta se não tiver dinheiro [DONE]
 
-5- Não deixar aposta se não tiver dinheiro [DONE]
+5- Rever base de dados (está a ficar demasiado confusa) [DONE] (still confusa tho)
 
-6- Rever base de dados (está a ficar demasiado confusa)
-
-7- Implementar API e perceber como atualizar ao vivo ou a cada inicio da aplicação, verificar que estejam na BD e ja tenham terminado
+6- Implementar API e perceber como atualizar ao vivo ou a cada inicio da aplicação, verificar que estejam na BD e ja tenham terminado [DONE]
 
 ###########################################
 
 Notas:
 
-Tentar implementar UI com flask em vez de django, parece mais simples
+Tentar implementar UI com flask em vez de django, parece mais simples (not going to be done, no time)

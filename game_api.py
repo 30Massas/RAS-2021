@@ -7,9 +7,6 @@ sports = {
         3: "Basketball"
     }
 
-# 1a Liga Portugal - 203
-# 1a Liga Basket Portugal - 7368
-# 
 
 url = "https://sportscore1.p.rapidapi.com/leagues/203/events"
 
