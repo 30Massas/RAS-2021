@@ -21,11 +21,33 @@ class Login():
             self.logged = False
 
     def register(self):
-        email = input("Email: ")
-        user = input("Username: ")
-        password = input('Password: ')
+        valid_email = False
+        while not valid_email:
+            email = input("Email: ")
+            if re.search(r'[a-zA-Z0-9].*@.*\.(pt|com)', email):
+                valid_email = True
+            else:
+                print('Insert a valid email!')
+        valid_user = False
+        while not valid_user:
+            if (user := input("Username: ")) != '':
+                valid_user = True
+            else:
+                print('Insert a valid username!')
+        valid_password = False
+        while not valid_password:
+            if (password := input('Password: ')) != '':
+                valid_password = True
+            else:
+                print('Insert a valid password!')
         # Verificar se IBAN é valido
-        iban = input("IBAN: ")
+        valid_iban = False
+        while not valid_iban:
+            iban = input("IBAN: ")
+            if re.search(r'[A-Z]{2}[0-9]{23}', iban):
+                valid_iban = True
+            else:
+                print('Insert a valid IBAN!')
         bday_form_correct = False
         while not bday_form_correct:
             bday = input("Enter your birthday (YYYY-MM-DD): ")
@@ -52,7 +74,13 @@ class Login():
         while (amount := int(input('Amount: '))) < 5:
             print('ERROR: Value Inferior to Minimum Deposit')
         # Cehck for valid CC
-        cc = input("CC: ")
+        valid_cc = False
+        while not valid_cc:
+            cc = input("CC: ")
+            if re.search(r'[0-9]{8}', cc):
+                valid_cc = True
+            else:
+                print('Insert a valid CC!')
         try:
             self.sql.register(email=email,user=user,password=password,amount=amount,iban=iban,cc=cc,tipo_moeda=option,montante=amount,bday=bday)
         except Exception:
@@ -100,3 +128,5 @@ Option: """))
             self.sql.convertCoin(self.user.email,to_convert,converted,amount)
         elif acc == 0:
             return
+        else:
+            print('ERROR: Not a valid option!')

@@ -47,7 +47,13 @@ class Bet():
             else:
                 odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
             g.print_coins()
-            option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+            valid=False
+            while not valid:
+                try:
+                    option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+                    valid = True
+                except Exception:
+                    print('ERROR: Invalid Option!')
             amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameSimple(user_id,game_id,option,amount,odd_choice)
         elif choice == 2:
@@ -70,6 +76,8 @@ class Bet():
                 print(f'#{game} -> {teams[team]}')
             try:
                 choice = int(input("""1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: """))
+                if choice > 3:
+                    print('ERROR: Invalid Option')
             except Exception:
                 print('ERROR: Invalid Option')
             # Permitir a remoção de uma aposta do boletim
@@ -90,6 +98,12 @@ class Bet():
                 print('ERROR: Invalid Option')
         else:
             g.print_coins()
-            option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+            valid=False
+            while not valid:
+                try:
+                    option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
+                    valid = True
+                except Exception:
+                    print('ERROR: Invalid Option!')
             amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameMultiple(user_id,games,option,amount)

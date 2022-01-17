@@ -256,7 +256,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
         # Print bets
         # Tentar fazer paginação
         b_ids = set()
-        cursor.execute("SELECT * FROM Boletim")
+        cursor.execute("SELECT * FROM Boletim WHERE user_email=%(user)s", {'user':email})
         if boletins := cursor.fetchall():
             for b in boletins:
                 if b[2] in b_ids:

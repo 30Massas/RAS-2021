@@ -12,11 +12,14 @@ except Exception as e:
     print(f'Something Went Wrong.')
 
 while not l.logged:
-    if (r:=int(input("1-Login\n2-Register\nOption: "))) == 1:
+    if (r:=int(input("1-Login\n2-Register\n0-Exit\nOption: "))) == 1:
         l.login()
         o.setObservant(l.user)
     elif r==2:
         l.register()
+    elif r==0:
+        print('Hope you comeback!')
+        exit()
     else:
         print('ERROR: Invalid Option')
         
