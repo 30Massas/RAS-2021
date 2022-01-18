@@ -124,7 +124,7 @@ Option: """))
             g.print_coins()
             to_convert = g.tipo_moedas[int(input('Choose the coin you want to convert: '))]
             converted = g.tipo_moedas[int(input('Choose the coin you want to convert to: '))]
-            amount = int(input('Amount: '))
+            amount = float(input('Amount: '))
             self.sql.convertCoin(self.user.email,to_convert,converted,amount)
         elif acc == 0:
             return

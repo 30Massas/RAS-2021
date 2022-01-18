@@ -1,5 +1,4 @@
 from login import Login
-from sql import SQL
 from bet import Bet
 from observer import Observer
 
@@ -10,18 +9,22 @@ try:
 except Exception as e:
     print(e)
     print(f'Something Went Wrong.')
+    exit()
 
 while not l.logged:
-    if (r:=int(input("1-Login\n2-Register\n0-Exit\nOption: "))) == 1:
-        l.login()
-        o.setObservant(l.user)
-    elif r==2:
-        l.register()
-    elif r==0:
-        print('Hope you comeback!')
-        exit()
-    else:
-        print('ERROR: Invalid Option')
+    try:
+        if (r:=int(input("1-Login\n2-Register\n0-Exit\nOption: "))) == 1:
+            l.login()
+            o.setObservant(l.user)
+        elif r==2:
+            l.register()
+        elif r==0:
+            print('Hope you comeback!')
+            exit()
+        else:
+            print('ERROR: Invalid Option')
+    except Exception:
+        print('ERROR: Insert a valid option!')
         
 logout = False
 
@@ -35,30 +38,33 @@ while not logout:
     5- Account Management
     0- Exit
 ######################################""")
-    choice = int(input("Option: "))
+    try:
+        choice = int(input("Option: "))
 
-    if choice == 0:
-        print('Hope you comeback!')
-        logout = True
-    else:
-        if choice == 1:
-            b.changeSport()
-        elif choice == 2:
-            if b.currentSport() == 'None':
-                print("Choose a Sport to Bet on!!")
-            else:
-                b.betOnGameSimple(l.user.email)
-        elif choice == 3:
-            if b.currentSport() == 'None':
-                print("Choose a Sport to Bet on!!")
-            else:
-                b.betOnGameMultiple(l.user.email)
-        elif choice == 4:
-            b.seeBestHistory(l.user.email)
-        elif choice == 5:
-            l.accountManagement()
+        if choice == 0:
+            print('Hope you comeback!')
+            logout = True
         else:
-            print('ERROR: Invalid Option')
-            
-                
+            if choice == 1:
+                b.changeSport()
+            elif choice == 2:
+                if b.currentSport() == 'None':
+                    print("Choose a Sport to Bet on!!")
+                else:
+                    b.betOnGameSimple(l.user.email)
+            elif choice == 3:
+                if b.currentSport() == 'None':
+                    print("Choose a Sport to Bet on!!")
+                else:
+                    b.betOnGameMultiple(l.user.email)
+            elif choice == 4:
+                b.seeBestHistory(l.user.email)
+            elif choice == 5:
+                l.accountManagement()
+            else:
+                print('ERROR: Invalid Option')
+    except ValueError as e:
+        print(e)
+        print('ERROR: Insert a valid option!')
+
 

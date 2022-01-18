@@ -25,8 +25,11 @@ class Bet():
             self.sql.listAllBets(self.currentSport(),0)
 
     def currentSport(self):
-        global sports
-        return sports[self.sport]
+        try:
+            return sports[self.sport]
+        except KeyError:
+            print('ERROR: Sport not avaiable!')
+            return sports[0]
 
     def changeSport(self):
         print(
@@ -36,6 +39,8 @@ class Bet():
 3 - Basketball
 """)
         self.sport = int(input("What sport do you want to bet on? "))
+        if self.sport not in sports:
+            self.sport=0
 
     def betOnGameSimple(self,user_id):
         self.listAllPossibleBets()
@@ -43,9 +48,24 @@ class Bet():
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
             if self.sport in coletivos:
-                odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+                valid=False
+                while not valid:
+                    odd_choice = int(input("Choose the winner (1-TeamA, 2-Tie, 3-TeamB): "))
+                    if not(odd_choice<1) or not(odd_choice>3):
+                        valid=True
+                    else:
+                        print('ERROR: Please choose a valid option!')
             else:
-                odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
+                valid=False
+                while not valid:
+                    try:
+                        odd_choice = int(input("Choose the winner (1-TeamA, 3-TeamB): "))
+                        if not(odd_choice==1) or not(odd_choice==3):
+                            valid=True
+                        else:
+                            print('ERROR: Please choose a valid option!')
+                    except ValueError:
+                        print('ERROR: Insert a valid option!')
             g.print_coins()
             valid=False
             while not valid:
@@ -75,9 +95,13 @@ class Bet():
             for game,team in games.items():
                 print(f'#{game} -> {teams[team]}')
             try:
-                choice = int(input("""1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: """))
-                if choice > 3:
-                    print('ERROR: Invalid Option')
+                valid=False
+                while not valid:
+                    choice = int(input("""1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: """))
+                    if not(choice<0) or not(choice>3):
+                        valid=True
+                    else:    
+                        print('ERROR: Invalid Option')
             except Exception:
                 print('ERROR: Invalid Option')
             # Permitir a remoção de uma aposta do boletim

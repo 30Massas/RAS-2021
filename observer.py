@@ -1,4 +1,5 @@
 import threading, time
+import globals as g
 import datetime as dd
 import mysql.connector as mysql
 from user import User
@@ -57,7 +58,7 @@ class Observer:
                     aux.add(game[1])
                 # Verifies if all games are finished
                 if len(aux) == 1 and 'Fechada' in aux:
-                    ganhos_totais = bets[boletim]['valor'] * bets[boletim]['odd']
+                    ganhos_totais = g.round_half_away_from_zero(bets[boletim]['valor'] * bets[boletim]['odd'])
                     coin_info = {
                         'tipo' : bets[boletim]['moeda'],
                         'user' : self.user.email,
@@ -67,6 +68,7 @@ class Observer:
                     cursor.execute("UPDATE boletim SET estado = 'Fechada' WHERE id=%(b_id)s", {'b_id' : boletim})
                     print(f'OBSERVER: Boletim#{boletim} now closed!')
                     self.connection.commit()
+            time.sleep(120)
         cursor.close()
 
     def handleGames(self):
