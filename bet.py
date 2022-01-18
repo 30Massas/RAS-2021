@@ -84,6 +84,9 @@ class Bet():
     def seeBestHistory(self,email):
         self.sql.seeBetHistory(email)
 
+    def seeActiveBets(self,email):
+        self.sql.seeActiveBets(email)
+
     def betOnGameMultiple(self,user_id):
         games = {}
         teams = {1: 'TeamA', 2: 'Tie', 3: 'TeamB'}

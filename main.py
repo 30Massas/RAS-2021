@@ -37,7 +37,8 @@ try:
     +f"""\n    2- {g.bcolors.OKGREEN}Bet Simple{g.bcolors.ENDC}"""
     +f"""\n    3- {g.bcolors.OKGREEN}Bet Multiple{g.bcolors.ENDC}"""
     +f"""\n    4- {g.bcolors.OKGREEN}See Bet History{g.bcolors.ENDC}"""
-    +f"""\n    5- {g.bcolors.OKGREEN}Account Management{g.bcolors.ENDC}"""
+    +f"""\n    5- {g.bcolors.OKGREEN}See Current Bets{g.bcolors.ENDC}"""
+    +f"""\n    6- {g.bcolors.OKGREEN}Account Management{g.bcolors.ENDC}"""
     +f"""\n    0- {g.bcolors.OKGREEN}Exit{g.bcolors.ENDC}"""
     +f"""\n{g.bcolors.OKBLUE}######################################{g.bcolors.ENDC}""")
         try:
@@ -62,6 +63,8 @@ try:
                 elif choice == 4:
                     b.seeBestHistory(l.user.email)
                 elif choice == 5:
+                    b.seeActiveBets(l.user.email)
+                elif choice == 6:
                     l.accountManagement()
                 else:
                     print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')

@@ -273,7 +273,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
         # Print bets
         # Tentar fazer paginação
         b_ids = set()
-        cursor.execute("SELECT * FROM Boletim WHERE user_email=%(user)s", {'user':email})
+        cursor.execute("SELECT * FROM Boletim WHERE user_email=%(user)s and estado='Fechada'", {'user':email})
         if boletins := cursor.fetchall():
             for b in boletins:
                 if b[2] in b_ids:
@@ -293,4 +293,37 @@ WHERE user_email=%(email)s""", {'email':user_id})
                                 print(f'GameID# {bet[1]} -> Tie ({jogo[3]})')
                             else:
                                 print(f'GameID# {bet[1]} -> {jogo[6]} ({jogo[4]})')
+        else:
+            print(f'{g.bcolors.WARNING}No Bets Made Yet{g.bcolors.ENDC}')
+        cursor.close()
+
+    def seeActiveBets(self,email):
+        cursor = self.connection.cursor()
+        # Fecth all Boletins
+        # For each boletim fetch all bets
+        # Print bets
+        # Tentar fazer paginação
+        b_ids = set()
+        cursor.execute("SELECT * FROM Boletim WHERE user_email=%(user)s and estado='Aberta'", {'user':email})
+        if boletins := cursor.fetchall():
+            for b in boletins:
+                if b[2] in b_ids:
+                    pass
+                else:
+                    print(f'Boletim #{b[2]} -> {b[5]}')
+                    print(f'Amount: {b[3]} {b[6]}')
+                    b_ids.add(b[2])
+                cursor.execute("SELECT * FROM bet WHERE id=%(id)s", {'id':b[1]})
+                if bets := cursor.fetchall():
+                    for bet in bets:
+                        cursor.execute("SELECT * FROM jogo WHERE id=%(id)s",{'id':bet[1]})
+                        if jogo:=cursor.fetchone():
+                            if int(bet[3]) == 1:
+                                print(f'GameID# {bet[1]} -> {jogo[5]} ({jogo[2]})')
+                            elif int(bet[3]) == 2:
+                                print(f'GameID# {bet[1]} -> Tie ({jogo[3]})')
+                            else:
+                                print(f'GameID# {bet[1]} -> {jogo[6]} ({jogo[4]})')
+        else:
+            print(f'{g.bcolors.WARNING}No Active Bets!{g.bcolors.ENDC}')
         cursor.close()
