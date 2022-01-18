@@ -90,16 +90,15 @@ class Login():
         print(f'{g.bcolors.OKGREEN}User sucessfuly registered!{g.bcolors.ENDC}')
 
     def accountManagement(self):
-        acc = int(input("""
-#################################
-        1- Check Balance 
-        2- Change Password
-        3- Deposit
-        4- Withdraw
-        5- Convert Currency
-        0- Exit
-#################################
-Option: """))
+        acc = int(input(f"""{g.bcolors.OKBLUE}#################################{g.bcolors.ENDC}"""
++f"""\n        1- {g.bcolors.OKGREEN}Check Balance{g.bcolors.ENDC}""" 
++f"""\n        2- {g.bcolors.OKGREEN}Change Password{g.bcolors.ENDC}"""
++f"""\n        3- {g.bcolors.OKGREEN}Deposit{g.bcolors.ENDC}"""
++f"""\n        4- {g.bcolors.OKGREEN}Withdraw{g.bcolors.ENDC}"""
++f"""\n        5- {g.bcolors.OKGREEN}Convert Currency{g.bcolors.ENDC}"""
++f"""\n        0- {g.bcolors.OKGREEN}Exit{g.bcolors.ENDC}"""
++f"""\n{g.bcolors.OKBLUE}#################################{g.bcolors.ENDC}"""
++f"""\n{g.bcolors.HEADER}Option: {g.bcolors.ENDC}"""))
         if acc == 1:
             self.sql.checkBalance(self.user.email)
         elif acc == 2:
