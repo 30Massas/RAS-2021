@@ -28,7 +28,7 @@ class Bet():
         try:
             return sports[self.sport]
         except KeyError:
-            print('ERROR: Sport not avaiable!')
+            print(f'{g.bcolors.WARNING}ERROR: Sport not avaiable!{g.bcolors.ENDC}')
             return sports[0]
 
     def changeSport(self):
@@ -44,7 +44,7 @@ class Bet():
 
     def betOnGameSimple(self,user_id):
         self.listAllPossibleBets()
-        choice = int(input("""1-Bet | 2-Exit \nOption: """))
+        choice = int(input(f"""{g.bcolors.HEADER}1-Bet | 2-Exit \nOption: {g.bcolors.ENDC}"""))
         if choice == 1:
             game_id = int(input("Enter the GameID you want to bet on: "))
             if self.sport in coletivos:
@@ -54,7 +54,7 @@ class Bet():
                     if not(odd_choice<1) or not(odd_choice>3):
                         valid=True
                     else:
-                        print('ERROR: Please choose a valid option!')
+                        print(f'{g.bcolors.WARNING}ERROR: Please choose a valid option!{g.bcolors.ENDC}')
             else:
                 valid=False
                 while not valid:
@@ -63,9 +63,9 @@ class Bet():
                         if not(odd_choice==1) or not(odd_choice==3):
                             valid=True
                         else:
-                            print('ERROR: Please choose a valid option!')
+                            print(f'{g.bcolors.WARNING}ERROR: Please choose a valid option!{g.bcolors.ENDC}')
                     except ValueError:
-                        print('ERROR: Insert a valid option!')
+                        print(f'{g.bcolors.WARNING}ERROR: Insert a valid option!{g.bcolors.ENDC}')
             g.print_coins()
             valid=False
             while not valid:
@@ -73,13 +73,13 @@ class Bet():
                     option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
                     valid = True
                 except Exception:
-                    print('ERROR: Invalid Option!')
+                    print(f'{g.bcolors.WARNING}ERROR: Invalid Option!{g.bcolors.ENDC}')
             amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameSimple(user_id,game_id,option,amount,odd_choice)
         elif choice == 2:
             return
         else:
-            print('ERROR: Invalid Option')
+            print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
 
     def seeBestHistory(self,email):
         self.sql.seeBetHistory(email)
@@ -90,20 +90,20 @@ class Bet():
         choice = -1
         while choice != 3:
             self.listAllPossibleBets()
-            print('###### Current Bet ######')
+            print(f'{g.bcolors.OKBLUE}###### Current Bet ######{g.bcolors.ENDC}')
             print('GameID - Team')
             for game,team in games.items():
                 print(f'#{game} -> {teams[team]}')
             try:
                 valid=False
                 while not valid:
-                    choice = int(input("""1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: """))
+                    choice = int(input(f"""{g.bcolors.HEADER}1-Bet | 2-Remove Bet | 3-Finish Bet | 0-Exit \nOption: {g.bcolors.ENDC}"""))
                     if not(choice<0) or not(choice>3):
                         valid=True
                     else:    
-                        print('ERROR: Invalid Option')
+                        print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
             except Exception:
-                print('ERROR: Invalid Option')
+                print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
             # Permitir a remoção de uma aposta do boletim
             # Permitir visualizar o boletim
             if choice == 1:
@@ -119,7 +119,7 @@ class Bet():
             elif choice == 0:
                 return
             elif choice>3:
-                print('ERROR: Invalid Option')
+                print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
         else:
             g.print_coins()
             valid=False
@@ -128,6 +128,6 @@ class Bet():
                     option = g.tipo_moedas[int(input('Choose the coin you want to bet with: '))]
                     valid = True
                 except Exception:
-                    print('ERROR: Invalid Option!')
+                    print(f'{g.bcolors.WARNING}ERROR: Invalid Option!{g.bcolors.ENDC}')
             amount = int(input("Enter the amount you want to bet: "))
             self.sql.betOnGameMultiple(user_id,games,option,amount)

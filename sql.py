@@ -24,10 +24,10 @@ class SQL():
             if cursor.fetchone():
                 return True
             else:
-                print('Incorrect password!')
+                print(f'{g.bcolors.FAIL}Incorrect password!{g.bcolors.ENDC}')
                 return False
         else:
-            print('No user with that email was found!')
+            print(f'{g.bcolors.FAIL}No User Found!{g.bcolors.ENDC}')
             return False
 
         cursor.close()
@@ -57,13 +57,13 @@ class SQL():
         cursor.execute("""
 SELECT montante,tipo FROM moeda
 WHERE user_email=%(email)s""", {'email':user_id})
-        print('##### Current Balance #####')
+        print(f'{g.bcolors.OKBLUE}##### Current Balance #####{g.bcolors.ENDC}')
         if db := cursor.fetchall():
             for coins in db:
                 print(f'\t{coins[0]} {coins[1]}')
         else:
-            print('You have no currency in your account!')
-        print('###########################')
+            print(f'{g.bcolors.WARNING}You Have No Currency In Your Account!{g.bcolors.ENDC}')
+        print(f'{g.bcolors.OKBLUE}###########################{g.bcolors.ENDC}')
         cursor.close()
 
     def changePassword(self,new_password,user_id):
@@ -91,9 +91,9 @@ WHERE user_email=%(email)s""", {'email':user_id})
             if r[0] >= amount:
                 cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email = %(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
             else:
-                print('ERROR: Withdraw Not Possible.')    
+                print(f'{g.bcolors.WARNING}ERROR: Withdraw Not Possible.{g.bcolors.ENDC}')    
         else:
-            print('ERROR: Withdraw Not Possible.')
+            print(f'{g.bcolors.WARNING}ERROR: Withdraw Not Possible.{g.bcolors.ENDC}')
         self.connection.commit()
 
         cursor.close()
@@ -123,7 +123,7 @@ WHERE user_email=%(email)s""", {'email':user_id})
         cursor.execute("SELECT odd_vitoriaCasa, equipaCasa, odd_empate, equipaVisitante, odd_vitoriaVisitante, id, horario, estado_apostavel FROM jogo WHERE jogo.desporto=%(sport)s" , {'sport' : sport})
         if games := cursor.fetchall():
             print("Game ID --> TeamA OddWinA - OddTie - OddWinB TeamB")
-            print("###################### Games to Bet ######################")
+            print(f"{g.bcolors.OKBLUE}###################### Games to Bet ######################{g.bcolors.ENDC}")
             for game in games:
                 if categoria == 1:
                     if game[7] == 'Aberta':
@@ -131,9 +131,9 @@ WHERE user_email=%(email)s""", {'email':user_id})
                 else:
                     if game[7] == 'Aberta':
                         print(f"{game[5]} --> {game[1]} {game[0]} - {game[4]} {game[3]} ")
-            print("#########################################################")
+            print(f"{g.bcolors.OKBLUE}#########################################################{g.bcolors.ENDC}")
         else:
-            print('No games were found!')
+            print(f'{g.bcolors.WARNING}No Games Were Found!{g.bcolors.ENDC}')
         cursor.close()
 
     def betOnGameSimple(self,user_id,game_id,option,amount,odd_choice):
@@ -181,19 +181,19 @@ WHERE user_email=%(email)s""", {'email':user_id})
                             cursor.execute("UPDATE moeda SET montante = montante - %(amount)s WHERE user_email=%(id)s AND tipo=%(tipo)s", {"amount":amount,"id":user_id,"tipo":option} )
                             self.connection.commit()
                         else:
-                            print('ERROR: Insufficient Funds')
+                            print(f'{g.bcolors.WARNING}ERROR: Insufficient Funds{g.bcolors.ENDC}')
                             return
                     except Exception:
-                        print(f'ERROR: No balance for {option}!')
+                        print(f'{g.bcolors.WARNING}ERROR: No balance for {g.bcolors.FAIL}{option}{g.bcolors.ENDC}!{g.bcolors.ENDC}')
                 elif choice == 2:
-                    print('Bet Cancelled')
+                    print(f'{g.bcolors.WARNING}Bet Cancelled{g.bcolors.ENDC}')
                     return
                 else:
-                    print('ERROR: Invalid Option')
+                    print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
             else:
-                print('ERROR: Invalid GameID chosen!')
+                print(f'{g.bcolors.WARNING}ERROR: Invalid GameID chosen!{g.bcolors.ENDC}')
         except Exception:
-            print('ERROR: Invalid GameID chosen!')
+            print(f'{g.bcolors.WARNING}ERROR: Invalid GameID chosen!{g.bcolors.ENDC}')
         cursor.close()
     
     def betOnGameMultiple(self,user_id,games_betted,option,amount):
@@ -240,12 +240,12 @@ WHERE user_email=%(email)s""", {'email':user_id})
                         last_id = cursor.lastrowid
                         bets.append(last_id)
                     else:
-                        print('ERROR: Insufficient Funds')
+                        print(f'{g.bcolors.WARNING}ERROR: Insufficient Funds{g.bcolors.ENDC}')
                         return
                 else:
-                    print('ERROR: Invalid GameID chosen!')
+                    print(f'{g.bcolors.WARNING}ERROR: Invalid GameID chosen!{g.bcolors.ENDC}')
             except Exception:
-                print('ERROR: Invalid GameID chosen!')
+                print(f'{g.bcolors.WARNING}ERROR: Invalid GameID chosen!{g.bcolors.ENDC}')
         for bet in bets:
             boletim_info['bet'] = bet
             boletim_info['valor_odd'] = total_odd
@@ -258,11 +258,11 @@ WHERE user_email=%(email)s""", {'email':user_id})
                 self.connection.commit()
                 valid=True
             elif choice == 2:
-                print('Bet Cancelled')
+                print(f'{g.bcolors.WARNING}Bet Cancelled{g.bcolors.ENDC}')
                 valid=True
                 return
             else:
-                print('ERROR: Invalid Option')
+                print(f'{g.bcolors.WARNING}ERROR: Invalid Option{g.bcolors.ENDC}')
 
         cursor.close()
 

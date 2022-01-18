@@ -66,7 +66,7 @@ class Observer:
                     }
                     cursor.execute("UPDATE moeda SET montante = montante + %(montante)s WHERE user_email=%(user)s AND tipo=%(tipo)s",coin_info)
                     cursor.execute("UPDATE boletim SET estado = 'Fechada' WHERE id=%(b_id)s", {'b_id' : boletim})
-                    print(f'OBSERVER: Boletim#{boletim} now closed!')
+                    print(f'\n{g.bcolors.OKBLUE}OBSERVER: Boletim#{boletim} now closed!{g.bcolors.ENDC}')
                     self.connection.commit()
             time.sleep(120)
         cursor.close()
@@ -80,7 +80,7 @@ class Observer:
             jogos = cursor.fetchall()
             for jogo in jogos:
                 if jogo[7] <= today:
-                    print(f'\nOBSERVER: Game#{jogo[0]} -> {jogo[5]} VS {jogo[6]} has finished!\n')
+                    print(f'\n{g.bcolors.OKBLUE}OBSERVER: Game#{jogo[0]} -> {jogo[5]} VS {jogo[6]} has finished!{g.bcolors.ENDC}')
                     cursor.execute("UPDATE jogo SET estado_apostavel='Fechada' WHERE id=%(id)s",{'id':jogo[0]})
             self.connection.commit()
         cursor.close()
